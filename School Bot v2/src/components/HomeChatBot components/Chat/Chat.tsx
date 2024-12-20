@@ -1,24 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Welcome from "../Welcome/Welcome";
 
-export const Chat = (currentChat: any) => {
+export const Chat = ({currentChat, changeInitialUse, saveMessage}:any) => {
   
   const [predefineTasks, setPredefineTasks] = useState(0)
   const [message, setMessage] = useState("")
+  const [initialUse, setInitialUse] = useState(currentChat.initialUse)
 
 
-
-  const saveMessage = (message : string) => {
-    /*
-    la funzione deve prendere in input il testo del messaggio, prendere la chat corrente e
-    aggiungere il messaggio alla sua cronologia
-    */
-
-  }
-
+   useEffect (() => {
+    changeInitialUse(initialUse)
+   }, [initialUse])
+   
   const sendMessageToModel = () =>{
     /*
-    la funzione quando chiamata deve inviare la messageHistory della current chat
+    Questa potrebbe essere chiamata direttamente lato server con la gestione del modello e dell' elaborazione
+    sull'applicativo che poi invia la risposta tramite api al client. DA CAPIRE
     */
   }
 
@@ -26,13 +23,10 @@ export const Chat = (currentChat: any) => {
 
   }
 
-  //Bisogna anche implementare il salvatggio dei dati della current chat quando vengono cambiati, 
-  //penso si possa fare con lo useEffect()
-
   return (
     <div className="chatbot">
       <div className="chat">
-        {!currentChat.initialUse ? (
+        {!initialUse ? (
           <div className="initialComponent">
             <div className="welcome">
               <Welcome /> 
@@ -40,42 +34,43 @@ export const Chat = (currentChat: any) => {
             <div className= "initialField">
               <form>
                 <input type="text" placeholder=" Chiedi a School Bot"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                 ></input>
                 <div className="initialButton">
-                  <button onClick={() => {currentChat.initialUse = true; saveMessage(message)}} > Invia </button>
+                  // inserire qua Arrow Button
+                  <button onClick= {() => {setInitialUse(true), saveMessage(message), setMessage("")}}> Invia </button>
                 </div>
               </form>
             </div>
             <div className="tasksPredefined"> 
-              <div className="firstTaks">
-                <button onClick = {() => {setPredefineTasks(1); usePredefineTasks(predefineTasks); }}> First task </button>
+              <div className="firstTasks">
+                <button onClick = {() => setInitialUse(true)}> First task </button>
               </div>
-              <div className="SecondoTaks">
-                <button onClick = {() => {setPredefineTasks(2); usePredefineTasks(predefineTasks); currentChat.initialUse = true}}> Second task </button>
+              <div className="secondTasks">
+                <button onClick = {() => setInitialUse(true)}> Second task </button>
               </div>
-              <div className="firstTaks">
-                <button onClick = {() => {setPredefineTasks(3); usePredefineTasks(predefineTasks); currentChat.initialUse = true}}> Thrid task </button>
+              <div className="thridTasks">
+                <button onClick = {() => setInitialUse(true)}> Thrid task </button>
               </div>
             </div>
           </div>
         ) : (
           <div className="currentComponent">
             <div className="messages">
-              {currentChat.messageHistory.map((message:any) => {
-                  <section className="messageBox">
+              {currentChat.messageHistory.map((message:any) => (
+                // problemi con il rendering della message History, problemi anche con il rendering di chatList
+                  <section key= {message.id} className="messageBox">
                     <h6>{message.role}</h6>
                     <p>{message.content}</p>
                   </section>
-              })}
-
+              ))}
             </div>
             <div className="currentField">
               <form>
                 <input type="text" placeholder=" Chiedi a School Bot"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                 ></input>
                 <div className="currentButton">
                   <button onClick={() => {saveMessage(message)}} > Invia </button> 

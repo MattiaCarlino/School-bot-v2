@@ -1,5 +1,5 @@
-import Sidebar from "../../components/Sidebar/Sidebar.tsx"
-import Chat from "../../components/Chat/Chat.tsx"
+import Sidebar from "../../components/HomeChatBot components/Sidebar/Sidebar.tsx"
+import Chat from "../../components/HomeChatBot components/Chat/Chat.tsx"
 import { useState } from "react"
 
 const Home = () => {
@@ -8,7 +8,6 @@ const Home = () => {
         in questa pagina ci saranno due componenti:
         - CHAT component
         - SIDEBAR component
-
 
         CHAT component:
         questo componente sarà la parte di interazione(chat) user e bot,
@@ -30,46 +29,72 @@ const Home = () => {
         impostare lo stato ma questa funzione e lo stato associato vanno dichiarate e gestite in Home page.
     */
 
-    const chatInitialized = {
-      id: 1,
-      title: "",
+    const[currentChat,setCurrentChat] = useState({
+      id: 0,
+      title: "chat n: 0",
       initialUse: false,
-      messaggeHistory: [{
+      messageHistory: [{
         id: 0,
         role: "bot",
         content: "Hi, I'm School Bot, How can I help you?"
       }]
-
-        /*
-        qua va definita la chat inizializzata ovvero i dati che ogni nuova chat
-        deve avere quando viene creata e dunque i dati che anche quando la pagina home si apre deve 
-        avere
-        */
-    }
-
-    const[currentChat,setCurrentChat] = useState(chatInitialized)
+    })
     const[chatList, setChatList] = useState([currentChat])
 
+    // lavorare sul salvataggio dei dati della chatList nel LocalStorage
     const saveChatLIst = () =>{
-      localStorage.setItem("chatList",JSON.stringify(saveChatLIst))
+      localStorage.setItem("chatList",JSON.stringify(chatList))
     }
 
     const newChat = () =>{
-      let newChat = chatInitialized
-      newChat.id = chatList.length+1
+      const idNewChat:number = currentChat.id +1
+      let newChat = {
+        id: idNewChat,
+        title: "Chat n:" + idNewChat,
+        initialUse: false,
+        messageHistory: [{
+          id: 0,
+          role: "bot",
+          content: "Hi, I'm School Bot, How can I help you?"
+        }]
+      }
       setChatList([...chatList,newChat])
       setCurrentChat(newChat)
       saveChatLIst()
     }
 
+    const setInitialUse = (valore: boolean) => {
+      setCurrentChat(prevChat => ({
+        ...prevChat,
+        initialUse: valore
+
+      }))
+    }
+
+    const saveMessageHistory = (message : string) =>{
+      console.log("arrivato in saveMessageHisotry")
+      // qua ci arriva ma il salvataggio dei nuovi messaggi ancora non funziona
+      const newMessage = {
+        id: currentChat.messageHistory.length,
+        role: "user",
+        content: message
+      } 
+      setCurrentChat(prevChat => ({
+        ...prevChat,
+        messageHistory:[...prevChat.messageHistory,newMessage]
+      }))
+      console.log(currentChat.messageHistory)
+    }
+
   return (
     <div className="Home">
         <div className="sidebar">
-        <Sidebar
-        newChat={newChat}
-        setCurrentChat={setCurrentChat}
-        chatList={chatList}
+        <Sidebar  
+          chatList={chatList}
+          newChat={newChat}
+          setCurrentChat={setCurrentChat}
         />
+       
       </div>
       <div className="accountLogo">
         qua per il logo dell'account in alto a destra
@@ -77,6 +102,8 @@ const Home = () => {
       <div className="chat">
         <Chat
         currentChat={currentChat}
+        changeInitialUse = {setInitialUse}
+        saveMessage = {saveMessageHistory}
         />
       </div>
     </div>
