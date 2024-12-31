@@ -1,7 +1,12 @@
+import React from 'react'
 
-const LeftBanner = (signUpLevel:any) => {
+interface componentProps{
+  numberLevel: 1 | 2 | 3
+}
+
+const LeftBanner: React.FC<componentProps> = (componentProps) => {
   return (
-    <div>LeftBanner</div>
+    <div>{componentProps.numberLevel}</div>
   )
 }
 

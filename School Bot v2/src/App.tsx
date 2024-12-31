@@ -8,7 +8,6 @@ import './App.css'
 function App() {
   return (
     <div>
-      app page
       <BrowserRouter>
           <Routes>
             <Route path="/AccessPage" element={<AccessPage />} />

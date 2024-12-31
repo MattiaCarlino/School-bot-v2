@@ -1,14 +1,36 @@
 import { Link } from "react-router-dom";
 import ChatBox from "../ChatBox/ChatBox";
-import { useEffect, useState } from "react";
 
-export const Sidebar = ({chatList,newChat,setCurrentChat}:any) => {
-  const [numberChat, setNumberChat] = useState()
+interface message {
+    id: number,
+    role: string,
+    content: string
+  }
 
-  useEffect(() =>{
-    console.log("arrivato allo use effect " + {numberChat})
-    setCurrentChat(numberChat)
-  }, [numberChat])
+  interface chat {
+    id: number,
+    title: string,
+    initialUse: boolean,
+    messageHistory:message[]
+  }
+
+  interface sideBarProps {
+    chatList: chat[],
+    newChat: () => void,
+    setCurrentChat: (newCurrentChat: chat) => void
+  }
+
+export const Sidebar: React.FC<sideBarProps> = ({chatList,newChat,setCurrentChat}) => {
+
+  /* la selezione delle chat funziona ma c'è un problema ancora più generale dato
+  dalla gestione degli state e dal salvataggio di ques'ultimi in Home.tsx, che subendo
+  re-rendering quando i loro valori cambiano, fa perdere i dati quando si va a operare con essi
+  */
+  const handleChat = (idChat: number) =>{
+    const chatSelected: chat | undefined = chatList.find(chat => chat.id == idChat);
+    if(chatSelected !== undefined)
+      setCurrentChat(chatSelected);
+  }
 
   // Da vedere il rendering della chatlist e verificare che la selezione della chat con setCurrentChat funzioni
   return (
@@ -17,7 +39,7 @@ export const Sidebar = ({chatList,newChat,setCurrentChat}:any) => {
           
         </div>
         <div className="expandButton">
-            il bottoncino per rendere fissa o adattiva
+            il bottoncino per rendere fissa o adaptive
             la sidebar
         </div>
         <div className="chatList">
@@ -28,14 +50,15 @@ export const Sidebar = ({chatList,newChat,setCurrentChat}:any) => {
             <button onClick={() => {newChat()}}> Nuova chat </button>
           </div>
           <div className="chats">
-            {chatList.map((chat : any) => (
+            {chatList.map((chat :chat) => (
               <ChatBox
               index = {chat.id}
-              chat = {chat}
-              setNumberChat = {setNumberChat}
+              title = {chat.title}
+              useChat = {false}
+              handleChat={handleChat}
+              // da capire come integrare setNumberChat = {setNumberChat}
               />
-            ))
-            }
+            ))}
           </div>
         </div>
         <div className="chronology">

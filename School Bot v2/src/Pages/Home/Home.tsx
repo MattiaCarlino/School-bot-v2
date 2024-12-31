@@ -1,8 +1,10 @@
 import Sidebar from "../../components/HomeChatBot components/Sidebar/Sidebar.tsx"
 import Chat from "../../components/HomeChatBot components/Chat/Chat.tsx"
 import { useState } from "react"
+import { Link } from 'react-router-dom'
+import { HiMiniUser } from "react-icons/hi2";
 
-const Home = () => {
+const Home: React.FC = () => {
     /*
         QUESTA PAGINA è HOME, quella che si aprirà appena si entra sull'app
         in questa pagina ci saranno due componenti:
@@ -29,26 +31,34 @@ const Home = () => {
         impostare lo stato ma questa funzione e lo stato associato vanno dichiarate e gestite in Home page.
     */
 
-    const[currentChat,setCurrentChat] = useState({
+    interface message {
+      id: number,
+      role: string,
+      content: string
+    }
+
+    interface chat {
+      id: number,
+      title: string,
+      initialUse: boolean,
+      messageHistory:message[]
+    }
+
+    const[currentChat,setCurrentChat] = useState<chat>({
       id: 0,
-      title: "chat n: 0",
+      title: "Chat n: 0",
       initialUse: false,
       messageHistory: [{
         id: 0,
         role: "bot",
-        content: "Hi, I'm School Bot, How can I help you?"
+        content: "Hi, I'm School Bot, how can I help you?"
       }]
     })
-    const[chatList, setChatList] = useState([currentChat])
-
-    // lavorare sul salvataggio dei dati della chatList nel LocalStorage
-    const saveChatLIst = () =>{
-      localStorage.setItem("chatList",JSON.stringify(chatList))
-    }
+    const[chatList, setChatList] = useState<chat[]>([currentChat])
 
     const newChat = () =>{
-      const idNewChat:number = currentChat.id +1
-      let newChat = {
+      const idNewChat:number = chatList.length
+      const newChat: chat= {
         id: idNewChat,
         title: "Chat n:" + idNewChat,
         initialUse: false,
@@ -60,7 +70,6 @@ const Home = () => {
       }
       setChatList([...chatList,newChat])
       setCurrentChat(newChat)
-      saveChatLIst()
     }
 
     const setInitialUse = (valore: boolean) => {
@@ -72,18 +81,35 @@ const Home = () => {
     }
 
     const saveMessageHistory = (message : string) =>{
-      console.log("arrivato in saveMessageHisotry")
       // qua ci arriva ma il salvataggio dei nuovi messaggi ancora non funziona
-      const newMessage = {
-        id: currentChat.messageHistory.length,
+      const idNewMessage : number = currentChat.messageHistory.length; 
+      const newMessage : message = {
+        id: idNewMessage,
         role: "user",
         content: message
-      } 
+      }
+      // cosa che non ha senso perché non è questo il problema, sta nella gestione degli stati e dei componenti
+      /*
+      const indexChat: number = currentChat.id;
+      let chatToModify: chat | undefined = chatList.find(chat => chat.id === indexChat);
+      chatToModify = {
+        ...currentChat,
+        messageHistory: [...currentChat.messageHistory, newMessage]
+      }
+      setChatList(prevChatList => ({
+        ...prevChatList
+        .splice(indexChat,1,chatToModify)
+
+      }))
+      */
       setCurrentChat(prevChat => ({
         ...prevChat,
         messageHistory:[...prevChat.messageHistory,newMessage]
       }))
-      console.log(currentChat.messageHistory)
+    }
+
+    const changeCurrentChat = (chatSelected: chat) => {
+      setCurrentChat(chatSelected);
     }
 
   return (
@@ -92,18 +118,23 @@ const Home = () => {
         <Sidebar  
           chatList={chatList}
           newChat={newChat}
-          setCurrentChat={setCurrentChat}
+          setCurrentChat={changeCurrentChat}
         />
        
       </div>
       <div className="accountLogo">
-        qua per il logo dell'account in alto a destra
+        <Link to={'/AccessPage'}>
+          <button>
+            <HiMiniUser />
+          </button>
+        </Link>
+
       </div>
       <div className="chat">
         <Chat
-        currentChat={currentChat}
-        changeInitialUse = {setInitialUse}
-        saveMessage = {saveMessageHistory}
+          currentChat={currentChat}
+          changeInitialUse = {setInitialUse}
+          saveMessage = {saveMessageHistory}
         />
       </div>
     </div>

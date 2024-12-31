@@ -1,9 +1,25 @@
+import React from 'react'
 
-const ChatBox = ({setNumberChat, chat}: any, index:number) => {
+interface chatBoxInfo {
+  index: number
+  title: string,
+  useChat: boolean,
+  content?: string,
+  handleChat?: (selectChat: number) => void
+}
+export const ChatBox: React.FC<chatBoxInfo> = (chatInfo) => {
   return (
-    <section key={index} >
-        <h4>{chat.title}</h4>
-        <button onClick={()=> {setNumberChat(chat)}}> seleziona </button>
+    <section key={chatInfo.index} >
+        <h4>{chatInfo.title}</h4>
+        {chatInfo.useChat ? (
+           <p>{chatInfo.content}</p>
+        ):(
+          <button onClick={() => {
+            if(typeof(chatInfo.handleChat) !== "undefined"){
+               chatInfo.handleChat(chatInfo.index)
+            }
+          }}> seleziona </button>
+        )}
     </section>
   )
 }

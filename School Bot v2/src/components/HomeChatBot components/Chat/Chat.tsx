@@ -1,16 +1,44 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Welcome from "../Welcome/Welcome";
+import ArrowButton from '../../ArrowButton/ArrowButton';
+import RenderingChatMessage from '../RenderingChatMessage/RenderingChatMessage';
 
-export const Chat = ({currentChat, changeInitialUse, saveMessage}:any) => {
+interface message {
+  id: number,
+  role: string,
+  content: string
+}
+
+interface chat {
+  id: number,
+  title: string,
+  initialUse: boolean,
+  messageHistory:message[]
+}
+
+interface chatProps {
+  currentChat: chat
+  changeInitialUse: (valore: boolean) => void,
+  saveMessage: (messaggio: string) => void
+}
+
+export const Chat: React.FC<chatProps> = ({changeInitialUse, saveMessage,currentChat}) => {
   
-  const [predefineTasks, setPredefineTasks] = useState(0)
-  const [message, setMessage] = useState("")
-  const [initialUse, setInitialUse] = useState(currentChat.initialUse)
-
+  const [predefineTasks, setPredefineTasks] = useState<number>(0)
+  const [message, setMessage] = useState<string>("")
+  const [initialUse, setInitialUse] = useState<boolean>(currentChat.initialUse)
 
    useEffect (() => {
     changeInitialUse(initialUse)
    }, [initialUse])
+
+   const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if(!initialUse)
+      setInitialUse(true);
+    saveMessage(message);
+    setMessage("");
+   }
    
   const sendMessageToModel = () =>{
     /*
@@ -32,14 +60,13 @@ export const Chat = ({currentChat, changeInitialUse, saveMessage}:any) => {
               <Welcome /> 
             </div>
             <div className= "initialField">
-              <form>
+              <form onSubmit={handleSubmit}>
                 <input type="text" placeholder=" Chiedi a School Bot"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                 ></input>
                 <div className="initialButton">
-                  // inserire qua Arrow Button
-                  <button onClick= {() => {setInitialUse(true), saveMessage(message), setMessage("")}}> Invia </button>
+                  <ArrowButton type='submit'/>
                 </div>
               </form>
             </div>
@@ -58,22 +85,18 @@ export const Chat = ({currentChat, changeInitialUse, saveMessage}:any) => {
         ) : (
           <div className="currentComponent">
             <div className="messages">
-              {currentChat.messageHistory.map((message:any) => (
-                // problemi con il rendering della message History, problemi anche con il rendering di chatList
-                  <section key= {message.id} className="messageBox">
-                    <h6>{message.role}</h6>
-                    <p>{message.content}</p>
-                  </section>
-              ))}
+              <RenderingChatMessage 
+                messageHistory={currentChat.messageHistory}
+              />
             </div>
             <div className="currentField">
-              <form>
+              <form onSubmit={handleSubmit}>
                 <input type="text" placeholder=" Chiedi a School Bot"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                 ></input>
                 <div className="currentButton">
-                  <button onClick={() => {saveMessage(message)}} > Invia </button> 
+                <ArrowButton type='submit'/>
                 </div>
               </form>
             </div>
